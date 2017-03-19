@@ -5,6 +5,7 @@ var clicked = new clickedConstructor();
 var student = new studentConstructor();
 var update = new updateConstructor();
 var display = new displayConstructor();
+var server = new serverConstructor();
 
 /**
  * Listen for the document to load and reset the data to the initial state
@@ -33,6 +34,10 @@ function clickedConstructor() {
     this.removeBtn = function (element) {
         student.remove(element);
     };
+
+    this.serverBtn = function (){
+        server.getData();
+    }
 }
 /**
  * student_array - global array to hold student objects
@@ -57,10 +62,17 @@ function studentConstructor() {
     this.array = [];
     this.inputIds = ['studentName', 'course', 'studentGrade'];
     this.addStudent = function () {
-        var studentObj = {};
-        for(var i = 0; i  < this.inputIds.length; i++){
-            studentObj[this.inputIds[i]] = $('#' + this.inputIds[i]).val() === "" ? 'Undefined user input!' : $('#' + this.inputIds[i]).val();
+        var studentObj = {
+            name : null,
+            course : null,
+            grade : null
+        };
+        var index = 0;
+        for(var key in studentObj){
+            studentObj[key] = $('#' + this.inputIds[index]).val() === "" ? 'Invalid Input!' : $('#' + this.inputIds[index]).val();
+            index++;
         }
+        console.log(studentObj);
         this.array.push(studentObj);
         update.data();
         return;
@@ -69,7 +81,7 @@ function studentConstructor() {
     this.calculateAverage = function () {
         var total = 0;
         for(var i = 0; i  < this.array.length; i++){
-            total += this.array[i].studentGrade === undefined ? 100 : parseInt(this.array[i].studentGrade);
+            total += this.array[i].grade === "Invalid Input!" ? 100 : parseInt(this.array[i].grade);
         }
         return ~~(total / this.array.length);
     };
@@ -115,11 +127,13 @@ function updateConstructor() {
 
 function displayConstructor() {
     this.addStudentToDom = function (passedStudentObj,index) {
-        var nameElement = '<td>'+passedStudentObj.studentName +'</td>';
-        var courseElement = '<td>'+passedStudentObj.course+'</td>';
-        var gradeElement = '<td>'+passedStudentObj.studentGrade+'</td>';
-        var removeButton = "<td><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button></td>";
-        $('.student-list tbody').append('<tr>'+ nameElement + courseElement + gradeElement + removeButton + '</tr>');
+        var element = {
+            name : "<td>"+passedStudentObj.name +"</td>",
+            course : "<td>"+passedStudentObj.course+"</td>",
+            grade : "<td>"+passedStudentObj.grade+"</td>",
+            removeButton : "<td><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button></td>"
+        };
+        $('.student-list tbody').append('<tr>'+ element.name + element.course + element.grade + element.removeButton + '</tr>');
         this.clearAddStudentForm();
     };
 
@@ -139,3 +153,21 @@ function displayConstructor() {
     };
 }
 
+function serverConstructor() {
+    this.getData = function () {
+        console.log('hang in there were pulling it from the cloud :)');
+        $.ajax({
+            'dataType' : 'json',
+            'method' : 'post',
+            'data' : {'api_key' : 'wgJ98cHF1h'},
+            'url' : 'http://s-apis.learningfuze.com/sgt/get',
+            "success" : function(serverObj) {
+                student.array.push(...serverObj.data);
+                update.data();
+            },
+            "error" : function () {
+                console.log('better luck next time mate :(');
+            }
+        });
+    };
+}

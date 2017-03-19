@@ -5,14 +5,14 @@ var clicked = new clickedConstructor();
 var student = new studentConstructor();
 var update = new updateConstructor();
 var display = new displayConstructor();
+
 /**
- * student_array - global array to hold student objects
- * @type {Array}
+ * Listen for the document to load and reset the data to the initial state
+ *
  */
-// go to line 55;
-//var student_array = [];
-
-
+$(document).ready(function () {
+    display.reset();
+});
 
 /**
  * addClicked - Event Handler when user clicks the add button
@@ -27,13 +27,18 @@ function clickedConstructor() {
     };
 
     this.cancelBtn = function () {
-        student.clearAddForm();
+        display.clearAddStudentForm();
     };
 
-    this.removeBtn = function () {
-        student.remove();
+    this.removeBtn = function (element) {
+        student.remove(element);
     };
 }
+/**
+ * student_array - global array to hold student objects
+ * @type {Array}
+ */
+
 /**
  * inputIds - id's of the elements that are used to add students
  * @type {string[]}
@@ -43,11 +48,6 @@ function clickedConstructor() {
  *
  * @return undefined
  */
-
-/**
- * clearAddStudentForm - clears out the form values based on inputIds variable
- */
-
 /**
  * calculateAverage - loop through the global student array and calculate average grade and return that value
  * @returns {number}
@@ -56,36 +56,28 @@ function clickedConstructor() {
 function studentConstructor() {
     this.array = [];
     this.inputIds = ['studentName', 'course', 'studentGrade'];
-
     this.addStudent = function () {
         var studentObj = {};
         for(var i = 0; i  < this.inputIds.length; i++){
-            studentObj[this.inputIds[i]] = $('#' + this.inputIds[i]).val();
+            studentObj[this.inputIds[i]] = $('#' + this.inputIds[i]).val() === "" ? 'Undefined user input!' : $('#' + this.inputIds[i]).val();
         }
-        console.log(studentObj);
         this.array.push(studentObj);
         update.data();
-        display.addStudentToDom(studentObj)
         return;
-    };
-
-    this.clearAddForm = function () {
-        for(var i = 0; i  < this.inputIds.length; i++){
-            $('#' + this.inputIds[i]).val("");
-        }
     };
 
     this.calculateAverage = function () {
         var total = 0;
         for(var i = 0; i  < this.array.length; i++){
-            total += this.array[i].grade === undefined ? 100 : parseInt(this.array[i].grade);
+            total += this.array[i].studentGrade === undefined ? 100 : parseInt(this.array[i].studentGrade);
         }
-        return total/this.array.length;
+        return ~~(total / this.array.length);
     };
 
-    this.remove = function () {
-        console.log('remove coming soon!');
-    }
+    this.remove = function (removeBtnElement) {
+        student.array.splice(parseInt(removeBtnElement.getAttribute('index')),1);
+        update.studentList();
+    };
 }
 
 /**
@@ -98,47 +90,52 @@ function studentConstructor() {
 
 function updateConstructor() {
     this.data = function () {
-        $('.avgGrade').text(student.calculateAverage());
+        display.gradeAverage(student.calculateAverage());
+        this.studentList();
     };
     
     this.studentList = function () {
-        for(var x = 0; x < student.array.length; x++){
-            display.addStudentToDom(student.array[x]);
+        $('.student-list tbody').html('');
+        for(var i = 0; i  < student.array.length; i++){
+            display.addStudentToDom(student.array[i],i);
         }
     }
 }
-
 /**
  * addStudentToDom - take in a student object, create html elements from the values and then append the elements
  * into the .student_list tbody
  * @param studentObj
  */
-
 /**
  * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
  */
+/**
+ * clearAddStudentForm - clears out the form values based on inputIds variable
+ */
 
 function displayConstructor() {
-    this.addStudentToDom = function (passedStudentObj) {
+    this.addStudentToDom = function (passedStudentObj,index) {
         var nameElement = '<td>'+passedStudentObj.studentName +'</td>';
         var courseElement = '<td>'+passedStudentObj.course+'</td>';
         var gradeElement = '<td>'+passedStudentObj.studentGrade+'</td>';
-        var removeButton = '<td><button type="button" class="btn btn-danger" onclick="clicked.removeBtn()">Remove</button></td>'
-        $('.student-list').find('tbody').append('<tr>'+ nameElement + courseElement + gradeElement + removeButton + '</tr>');
-        student.clearAddForm();
+        var removeButton = "<td><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button></td>";
+        $('.student-list tbody').append('<tr>'+ nameElement + courseElement + gradeElement + removeButton + '</tr>');
+        this.clearAddStudentForm();
     };
 
     this.reset = function () {
         student.array = [];
-        student.clearAddForm();
-    }
+        this.clearAddStudentForm();
+    };
+
+    this.clearAddStudentForm = function () {
+        for(var i = 0; i  < student.inputIds.length; i++){
+            $('#' + student.inputIds[i]).val("");
+        }
+    };
+
+    this.gradeAverage = function (value) {
+        $('.avgGrade').text(value);
+    };
 }
 
-
-/**
- * Listen for the document to load and reset the data to the initial state
- *
- */
-$(document).ready(function () {
-   display.reset();
-});

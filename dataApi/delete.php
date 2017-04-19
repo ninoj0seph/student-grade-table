@@ -20,12 +20,4 @@ if(empty($result)){
         $output['errors'][] = 'delete error';
     }
 }
-//check if $result is empty.  
-	//if it is, add 'database error' to errors
-//else: 
-	//check if the number of affected rows is 1
-		//if it did, change output success to true
-		
-	//if not, add to the errors: 'delete error'
-
 ?>

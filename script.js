@@ -13,6 +13,7 @@ var server = new serverConstructor();
  */
 $(document).ready(function () {
     display.reset();
+    server.getData();
 });
 
 /**
@@ -33,10 +34,6 @@ function clickedConstructor() {
 
     this.removeBtn = function (element) {
         student.remove(element);
-    };
-
-    this.syncBtn = function () {
-        server.syncData();
     };
 }
 /**
@@ -71,13 +68,15 @@ function studentConstructor() {
         for(var key in this.studentObj){
             this.studentObj[key] = key !== "grade" ? $('#' + this.inputIds[index]).val() : $('#' + this.inputIds[index]).val() > 100 ? 100 : $('#' + this.inputIds[index]).val();
             if(this.studentObj[key] === ""){
-                console.log('Invalid input: Student ' + key);
+                $()
+                display.alertBoxShow('Invalid input: Student ' + key);
                 return;
             }
+            display.alertBoxHide();
             index++;
         }
         this.array.unshift(this.studentObj);
-        //server.createData(this.studentObj);
+        server.createData(this.studentObj);
         update.data();
         return;
     };
@@ -85,17 +84,17 @@ function studentConstructor() {
     this.calculateAverage = function () {
         var total = 0;
         for(var i = 0; i  < this.array.length; i++){
-            total += this.array[i].grade === parseInt(this.array[i].grade);
+            total += parseInt(this.array[i].grade);
         }
         return ~~(total / this.array.length);
     };
 
     this.remove = function (removeBtnElement) {
         var removeIndex = parseInt(removeBtnElement.getAttribute('index'));
-        if(student.array[removeIndex].id !== undefined){
-            server.deleteData(student.array[removeIndex].id);
-            console.log('item deleted on the server');
+        if(!server.deleteData(student.array[removeIndex].id)){
+            return;
         }
+        console.log('item deleted on the server');
         student.array.splice(removeIndex,1);
         update.data();
     };
@@ -120,7 +119,10 @@ function updateConstructor() {
         for(var i = 0; i  < student.array.length; i++){
             display.addStudentToDom(student.array[i],i);
         }
-    }
+    };
+
+
+
 }
 /**
  * addStudentToDom - take in a student object, create html elements from the values and then append the elements
@@ -135,7 +137,6 @@ function updateConstructor() {
  */
 
 function displayConstructor() {
-
     this.addStudentToDom = function (passedStudentObj,index) {
         var element = {
             name : "<td>"+passedStudentObj.name +"</td>",
@@ -148,6 +149,7 @@ function displayConstructor() {
     };
 
     this.reset = function () {
+        display.alertBoxHide();
         student.array = [];
         this.clearAddStudentForm();
     };
@@ -159,8 +161,7 @@ function displayConstructor() {
     };
 
     this.gradeAverage = function (value) {
-        $('.avgGrade').removeClass('label-default').addClass(value >= 80 ? 'label-success' : value >= 70 ? 'label-warning' : 'label-danger');
-        $('.avgGrade').text(value);
+        $('.avgGrade').removeClass('label-success label-warning label-danger label-default').addClass(value >= 80 ? 'label-success' : value >= 70 ? 'label-warning' : 'label-danger').text(value);
     };
 
     this.disableLetters = function (evt) {
@@ -173,89 +174,109 @@ function displayConstructor() {
     };
 
     this.modal = function (messageToShow) {
+        $('.modal-title').text("Please Wait :)");
         $("#message").text(messageToShow);
         $("#displayMsgModal").modal('toggle');
-    }
+        $('.loader').show();
+        $('.modalExit').hide();
+    };
 
-    this.errorModal = function () {
-        var exitButton = '<button type="button" class="btn-lg btn-danger" data-dismiss="modal">Close</button>';
-        $('.modal-title').text("Failed Response");
-        $('#message').text("Something went wrong :(");
-        $('.modal-footer').append(exitButton);
-        $("#displayMsgModal").modal('toggle');
-    }
+    this.errorModal = function (message) {
+        $('.modal-title').text("Something went wrong :(");
+        $('#message').text(message);
+        $('.loader').hide();
+        $('.modalExit').show();
+    };
+
+    this.alertBoxHide = function () {
+        $('.alert').hide();
+    };
+
+    this.alertBoxShow = function (outputText) {
+        $('.alert span').html('<strong>Error! </strong>' + outputText);
+        $('.alert').show();
+    };
 }
 
 function serverConstructor() {
-    this.failed = false;
-    this.syncData = function () {
-        display.modal("Fetching Data From the Friendly Skies!");
-        if(student.array.length >= 1){
-            for(var i = 0; i  < student.array.length; i++){
-                if(student.array[i].id === undefined){
-                    this.createData(student.array[i]);
-                }
-            }
-        }
-        this.getData();
-    };
-
     this.getData = function () {
-        setTimeout(display.modal,1000);
         $.ajax({
             'dataType' : 'json',
-            'method' : 'POST',
-            'data' : {'api_key' : 'wgJ98cHF1h'},
-            'url' : 'http://s-apis.learningfuze.com/sgt/get',
+            'url' : 'http://54.213.197.41/api/sgt/data.php?action=readAll',
             "success" : function(serverObj) {
-                student.array = serverObj.data.slice().reverse();
-                update.data();
+                console.log(serverObj.data);
+                if(serverObj.success){
+                    student.array = serverObj.data.slice().reverse();
+                    update.data();
+                } else {
+                    display.modal();
+                    display.errorModal(serverObj.error[0]);
+                }
             },
-            error: function(response) {
-                console.log("response failed");
+            error: function(serverobj) {
+                console.error('conn error');
+                display.modal();
+                display.errorModal("Response failed");
             }
         });
     };
     
     this.createData = function (objectToAdd) {
-        console.log('sending you data');
+        display.modal("Sync Data From the Friendly Skies!");
         $.ajax({
+            data: 'json',
             'dataType' : 'json',
-            'method' : 'post',
+            'method' : 'POST',
             'data' : {
-                'api_key' : 'wgJ98cHF1h',
                 'name' : objectToAdd.name,
                 'course' : objectToAdd.course,
                 'grade' : objectToAdd.grade
             },
-            'url' : 'http://s-apis.learningfuze.com/sgt/create',
-            "success" : function(returnConformation) {
-                console.log("success!");
-                objectToAdd.new_id = returnConformation.new_id;
+            'url' : 'http://54.213.197.41/api/sgt/data.php?action=insert',
+            "success" : function(serverObj) {
+                if(serverObj.status === 200){
+                    setTimeout(function () {
+                        console.log(serverObj);
+                        objectToAdd.id = serverObj.new_id;
+                        display.modal();
+                    },1000)
+                } else {
+                    display.errorModal(serverObj.error[0]);
+                }
             },
-            error: function(response) {
-                console.log("response failed");
+            error: function(serverObj) {
+                console.error(serverObj);
+                display.errorModal("Response failed");
             }
         });
     };
 
     this.deleteData = function (id) {
-        display.modal("Abolishing Data From the Friendly Skies!");
-        setTimeout(display.modal,1000);
+        var statusCheck = null;
+        display.modal("Deleting Data From the Friendly Skies!");
         $.ajax({
             'dataType' : 'json',
             'method' : 'post',
             'data' : {
-                'api_key' : 'wgJ98cHF1h',
-                'student_id' : id
+                'id' : id
             },
-            'url' : 'http://s-apis.learningfuze.com/sgt/delete',
+            'url' : 'http://54.213.197.41/api/sgt/data.php?action=delete',
             "success" : function(serverObj) {
-                console.log(serverObj);
+                if(serverObj.success){
+                    console.log(serverObj.success)
+                    setTimeout(function () {
+                        display.modal();
+                    },1000);
+                } else {
+                    display.errorModal(serverObj.error === undefined ? serverObj.errors[0] : (serverObj.error[0]));
+                }
             },
-            error: function(response) {
-                console.log("response failed");
+            error: function(serverObj) {
+                console.log(serverObj)
+                display.errorModal("Response failed");
+                statusCheck = false;
             }
         });
+        return statusCheck;
     };
 }

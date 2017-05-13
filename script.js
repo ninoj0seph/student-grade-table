@@ -91,9 +91,7 @@ function studentConstructor() {
 
     this.remove = function (removeBtnElement) {
         var removeIndex = parseInt(removeBtnElement.getAttribute('index'));
-        if(!server.deleteData(student.array[removeIndex].id)){
-            return;
-        }
+        server.deleteData(student.array[removeIndex].id);
         console.log('item deleted on the server');
         student.array.splice(removeIndex,1);
         update.data();
@@ -234,7 +232,7 @@ function serverConstructor() {
             },
             'url' : 'http://54.213.197.41/api/sgt/data.php?action=insert',
             "success" : function(serverObj) {
-                if(serverObj.status === 200){
+                if(serverObj.success){
                     setTimeout(function () {
                         console.log(serverObj);
                         objectToAdd.id = serverObj.new_id;
@@ -263,10 +261,12 @@ function serverConstructor() {
             'url' : 'http://54.213.197.41/api/sgt/data.php?action=delete',
             "success" : function(serverObj) {
                 if(serverObj.success){
-                    console.log(serverObj.success)
+                    console.log(serverObj.success);
+                    server.getData();
                     setTimeout(function () {
                         display.modal();
                     },1000);
+
                 } else {
                     display.errorModal(serverObj.error === undefined ? serverObj.errors[0] : (serverObj.error[0]));
                 }

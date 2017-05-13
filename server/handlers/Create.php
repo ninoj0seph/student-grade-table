@@ -1,6 +1,4 @@
 <?php
-print_r($_GET);
-
 $name = $_GET['name'];
 $grade = $_GET['grade'];
 $course = $_GET['course'];

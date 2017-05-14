@@ -2,7 +2,7 @@
     class Create{
         private $credentials;
         private $output;
-        private $query = "INSERT INTO `student_data`(`name`, `grade`, `course`) VALUES(?,?,?)";
+        private $query = "INSERT INTO `student_data`(`name`, `grade`, `course`) VALUES( ? , ? , ? )";
         function __construct($input){
             $this->credentials = $input;
         }

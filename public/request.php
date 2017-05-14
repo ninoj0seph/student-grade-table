@@ -2,7 +2,7 @@
     spl_autoload_register(function ($class_name) {
         require_once '../server/handlers/'.$class_name . '.php';
     });
-//    header('Content-type: application/json');
+    header('Content-type: application/json');
 
     switch(strtolower($_GET['action'])){
         case 'read' :

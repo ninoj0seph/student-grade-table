@@ -1,0 +1,7 @@
+{
+  "student" : {
+    "name" : "Donald Duck",
+    "grade" : 9,
+    "course" : "Quack"
+  }
+}

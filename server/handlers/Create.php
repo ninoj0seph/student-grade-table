@@ -1,32 +1,36 @@
 <?php
-$name = $_GET['name'];
-$grade = $_GET['grade'];
-$course = $_GET['course'];
-if(empty($name)){
-    $output['errors'][] = 'invalid name';
-} elseif (empty($grade)){
-    $output['errors'][] = 'invalid grade';
-} elseif (empty($course)){
-    $output['errors'][] = 'invalid course';
-}
+    class Create{
+        private $credentials;
+        private $output;
+        private $query = "INSERT INTO `student_data`(`name`, `grade`, `course`) VALUES(?,?,?)";
+        function __construct($input){
+            $this->credentials = $input;
+        }
 
-//check if you have all the data you need from the client-side call.
-//if not, add an appropriate error to errors
-$query = "INSERT INTO `student_data`(`name`, `grade`, `course_name`) VALUES ('$name','$grade','$course')";
-//write a query that inserts the data into the database.  remember that ID doesn't need to be set as it is auto incrementing
-//send the query to the database, store the result of the query into $result
-$result = mysqli_query($conn,$query);
-var_dump($result);
-if(empty($result)){
-    $output['errors'][] = 'database error';
-} else {
-    if(mysqli_affected_rows($conn) === 1){
-        $output['success'] = true;
-        $insertID = mysqli_insert_id($conn);
-        $new_id = mysqli_insert_id($conn);
-        $output['$insertID'] = $insertID;
-    } else {
-        $output['errors'][] = 'insert error';
+        public function initialize(){
+            require_once 'mysql_connect.php';
+
+            if (!( $stmt = $conn->prepare($this->query))){
+                $this->output = "422 Unprocessible Entity - Statement failed to prepare: ".$conn->error;
+                return;
+            }
+
+            if (!($stmt->bind_param('sis', $this->credentials['student']['name'],$this->credentials['student']['grade'],$this->credentials['student']['course']))){
+                $this->output = "422 Unprocessible Entity - Parameters failed to bind: ".$stmt->error;
+                return;
+            }
+
+            if (!($stmt->execute())){
+                $this->output = "422 Unprocessible Entity - Statement failed to execute: ".$stmt->error;
+                return;
+            }
+
+            if($conn->affected_rows === 1){
+                $this->output['status'] = 200;
+                $this->output['studentId'] = $conn->insert_id;
+            } else {
+                $this->output['status'][] = '503 Service unavailable  - Insert Error';
+            }
+            return $this->output;
+        }
     }
-}
-?>

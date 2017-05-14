@@ -1,0 +1,2 @@
+RewriteEngine on
+RewriteRule ^api/(.*) request.php?action=$1 [NC]

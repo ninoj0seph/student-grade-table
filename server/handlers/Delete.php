@@ -6,9 +6,6 @@
         }
 
         public function initialize(){
-
-
-
             $id = $_GET['id'];
             if (empty($id)) {
                 $output['errors'][] = 'invalid id';

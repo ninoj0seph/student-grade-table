@@ -1,7 +1,7 @@
 <?php
     class Read{
         private $query = "SELECT * FROM `student_data`";
-        public $output;
+        private $output;
         public function initialize(){
             require_once 'mysql_connect.php';
             $result = $conn->query($this->query);
@@ -21,5 +21,3 @@
             return $this->output;
         }
     }
-
-?>

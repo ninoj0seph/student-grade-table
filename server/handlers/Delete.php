@@ -14,7 +14,7 @@
                 return;
             }
 
-            if (!($stmt->bind_param('i', $this->studentId['student']['sid']))){
+            if (!($stmt->bind_param('s', $this->studentId['sid']))){
                 $this->output = "422 Unprocessible Entity - Parameters failed to bind: ".$stmt->error;
                 return;
             }
@@ -26,9 +26,9 @@
 
             if($conn->affected_rows === 1){
                 $this->output['status'] = 200;
-                $this->output['message'] = 'student id no.' . $this->studentId['student']['sid'] . ' has been removed';
+                $this->output['message'] = 'student id no.' . $this->studentId['sid'] . ' has been removed';
             } else {
-                $this->output['status'][] = '422 Unprocessible Entity  - No student found on id ' . $this->studentId['student']['sid'];
+                $this->output['status'][] = '422 Unprocessible Entity  - No student found on id ' . $this->studentId['sid'];
             }
             return $this->output;
         }

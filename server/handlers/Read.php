@@ -10,7 +10,7 @@
                 $this->output['debug'][] = $conn->error;
             } else {
                 if(mysqli_num_rows($result) > 0){
-                    $this->output['status'] = '200 - Ok!';
+                    $this->output['status'] = 200;
                     while($row = mysqli_fetch_assoc($result)){
                         $this->output['students'][] = $row;
                     }

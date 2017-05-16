@@ -11,17 +11,17 @@
             require_once 'mysql_connect.php';
 
             if (!( $stmt = $conn->prepare($this->query))){
-                $this->output = "422 Unprocessible Entity - Statement failed to prepare: ".$conn->error;
+                $this->output['status'][] = "422 Unprocessible Entity - Statement failed to prepare: ".$conn->error;
                 return;
             }
 
             if (!($stmt->bind_param('sis', $this->credentials['student']['name'],$this->credentials['student']['grade'],$this->credentials['student']['course']))){
-                $this->output = "422 Unprocessible Entity - Parameters failed to bind: ".$stmt->error;
+                $this->output['status'][] = "422 Unprocessible Entity - Parameters failed to bind: ".$stmt->error;
                 return;
             }
 
             if (!($stmt->execute())){
-                $this->output = "422 Unprocessible Entity - Statement failed to execute: ".$stmt->error;
+                $this->output['status'][] = "422 Unprocessible Entity - Statement failed to execute: ".$stmt->error;
                 return;
             }
 

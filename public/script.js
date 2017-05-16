@@ -60,25 +60,25 @@ function studentConstructor() {
     this.inputIds = ['studentName', 'course', 'studentGrade'];
     this.addStudent = function () {
         this.studentObj = {
-            name : null,
-            course : null,
-            grade : null
+            student : {
+                name : null,
+                course : null,
+                grade : null
+            }
         };
         var index = 0;
-        for(var key in this.studentObj){
-            this.studentObj[key] = key !== "grade" ? $('#' + this.inputIds[index]).val() : $('#' + this.inputIds[index]).val() > 100 ? 100 : $('#' + this.inputIds[index]).val();
+        for(var key in this.studentObj.student){
+            this.studentObj.student[key] = $('#' + this.inputIds[index]).val();
+                // key !== "grade" ? $('#' + this.inputIds[index]).val() : $('#' + this.inputIds[index]).val() > 100 ? 100 : $('#' + this.inputIds[index]).val();
             if(this.studentObj[key] === ""){
-                $()
                 display.alertBoxShow('Invalid input: Student ' + key);
                 return;
             }
             display.alertBoxHide();
             index++;
         }
-        this.array.unshift(this.studentObj);
+        // this.array.unshift (this.studentObj);
         server.createData(this.studentObj);
-        update.data();
-        return;
     };
 
     this.calculateAverage = function () {
@@ -91,8 +91,8 @@ function studentConstructor() {
 
     this.remove = function (removeBtnElement) {
         var removeIndex = parseInt(removeBtnElement.getAttribute('index'));
-        server.deleteData(student.array[removeIndex].id);
-        console.log('item deleted on the server');
+        var payload = {sid : student.array[removeIndex].id};
+        server.deleteData(payload);
         student.array.splice(removeIndex,1);
         update.data();
     };
@@ -172,7 +172,7 @@ function displayConstructor() {
     };
 
     this.modal = function (messageToShow) {
-        $('.modal-title').text("Please Wait :)");
+        $('.modal-title').text("Please Wait");
         $("#message").text(messageToShow);
         $("#displayMsgModal").modal('toggle');
         $('.loader').show();
@@ -180,7 +180,7 @@ function displayConstructor() {
     };
 
     this.errorModal = function (message) {
-        $('.modal-title').text("Something went wrong :(");
+        $('.modal-title').text("Something went wrong");
         $('#message').text(message);
         $('.loader').hide();
         $('.modalExit').show();
@@ -200,83 +200,70 @@ function serverConstructor() {
     this.getData = function () {
         $.ajax({
             'dataType' : 'json',
-            'url' : 'http://54.213.197.41/api/sgt/data.php?action=readAll',
+            'url' : 'http://localhost:8888/api/read',
             "success" : function(serverObj) {
-                console.log(serverObj.data);
-                if(serverObj.success){
-                    student.array = serverObj.data.slice().reverse();
+                if(serverObj.status === 200){
+                    student.array = serverObj.students.slice().reverse();
                     update.data();
                 } else {
                     display.modal();
-                    display.errorModal(serverObj.error[0]);
+                    display.errorModal(serverObj.status);
                 }
             },
-            error: function(serverobj) {
-                console.error('conn error');
+            error: function() {
                 display.modal();
                 display.errorModal("Response failed");
             }
         });
     };
     
-    this.createData = function (objectToAdd) {
-        display.modal("Sync Data From the Friendly Skies!");
+    this.createData = function (payload) {
+        display.modal("Posting Data to the Friendly Skies!");
         $.ajax({
-            data: 'json',
-            'dataType' : 'json',
-            'method' : 'POST',
-            'data' : {
-                'name' : objectToAdd.name,
-                'course' : objectToAdd.course,
-                'grade' : objectToAdd.grade
-            },
-            'url' : 'http://54.213.197.41/api/sgt/data.php?action=insert',
+            contentType :'application/json',
+            type: "POST",
+            url: 'http://localhost:8888/api/create',
+            data: JSON.stringify(payload),
+            dataType: "json",
             "success" : function(serverObj) {
-                if(serverObj.success){
+                if(serverObj.status === 200){
                     setTimeout(function () {
-                        console.log(serverObj);
-                        objectToAdd.id = serverObj.new_id;
+                        payload.id = serverObj.studentId;
                         display.modal();
+                        server.getData();
                     },1000)
                 } else {
-                    display.errorModal(serverObj.error[0]);
+                    display.errorModal(serverObj.status);
                 }
             },
             error: function(serverObj) {
-                console.error(serverObj);
                 display.errorModal("Response failed");
             }
         });
     };
 
-    this.deleteData = function (id) {
-        var statusCheck = null;
+    this.deleteData = function (payload) {
         display.modal("Deleting Data From the Friendly Skies!");
         $.ajax({
+            contentType :'application/json',
             'dataType' : 'json',
-            'method' : 'post',
-            'data' : {
-                'id' : id
-            },
-            'url' : 'http://54.213.197.41/api/sgt/data.php?action=delete',
+            'method' : 'POST',
+            'data' : JSON.stringify(payload),
+            'url' : 'http://localhost:8888/api/delete',
             "success" : function(serverObj) {
-                if(serverObj.success){
-                    console.log(serverObj.success);
+                if(serverObj.status === 200){
                     server.getData();
                     setTimeout(function () {
                         display.modal();
                     },1000);
 
                 } else {
-                    display.errorModal(serverObj.error === undefined ? serverObj.errors[0] : (serverObj.error[0]));
+                    display.errorModal(serverObj.status);
                 }
             },
-            error: function(serverObj) {
-                console.log(serverObj)
+            error: function() {
                 display.errorModal("Response failed");
-                statusCheck = false;
             }
         });
-        return statusCheck;
     };
 }

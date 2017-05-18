@@ -69,15 +69,14 @@ function studentConstructor() {
         var index = 0;
         for(var key in this.studentObj.student){
             this.studentObj.student[key] = $('#' + this.inputIds[index]).val();
-                // key !== "grade" ? $('#' + this.inputIds[index]).val() : $('#' + this.inputIds[index]).val() > 100 ? 100 : $('#' + this.inputIds[index]).val();
-            if(this.studentObj[key] === ""){
+            console.log(this)
+            if(this.studentObj.student[key] === ""){
                 display.alertBoxShow('Invalid input: Student ' + key);
                 return;
             }
             display.alertBoxHide();
             index++;
         }
-        // this.array.unshift (this.studentObj);
         server.createData(this.studentObj);
     };
 
@@ -200,7 +199,7 @@ function serverConstructor() {
     this.getData = function () {
         $.ajax({
             'dataType' : 'json',
-            'url' : 'http://localhost:8888/api/read',
+            'url' : 'https://ninojoseph.com/sgt/read',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     student.array = serverObj.students.slice().reverse();
@@ -222,7 +221,7 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            url: 'http://localhost:8888/api/create',
+            url: 'https://ninojoseph.com/sgt/create',
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function(serverObj) {
@@ -249,7 +248,7 @@ function serverConstructor() {
             'dataType' : 'json',
             'method' : 'POST',
             'data' : JSON.stringify(payload),
-            'url' : 'http://localhost:8888/api/delete',
+            'url' : 'https://ninojoseph.com/sgt/delete',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     server.getData();

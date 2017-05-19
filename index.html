@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.js"
+            integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+            crossorigin="anonymous"></script>
+    <meta name="viewport" content="initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="spinner.css">
+    <script src="script.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="alert alert-danger">
+        <span></span>
+    </div>
+    <div class="container">
+        <!-- only show this element when the isnt on mobile -->
+        <h1 class="hidden-xs">Student Grade Table
+            <small class="pull-right">Grade Average : <span class="avgGrade label label-default">0</span></small>
+        </h1>
+        <!-- only show this element when the user gets to a mobile version -->
+        <h3 class="visible-xs ">Student Grade Table
+            <small class="pull-right">Grade Average : <span class="avgGrade label label-default">0</span></small>
+        </h3>
+    </div>
+    <div class="student-add-form col-sm-4 pull-right">
+        <h4>Add Student</h4>
+        <div class="input-group form-group">
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-user"></span>
+            </span>
+            <input type="text" class="form-control" name="studentName" id="studentName" placeholder="Student Name">
+        </div>
+        <div class="input-group form-group">
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-list-alt"></span>
+            </span>
+            <input type="text" class="form-control" name="course" id="course"
+                   placeholder="Student Course">
+        </div>
+        <div class="input-group form-group">
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-education"></span>
+            </span>
+            <input type="number" max="100" class="form-control" name="studentGrade" id="studentGrade"
+                   placeholder="Student Grade" maxlength="3" onkeypress="return display.disableLetters(event)">
+        </div>
+        <div class="btn-group-horizontal">
+            <button type="button" class="btn btn-success" onclick="clicked.addBtn()">Add</button>
+            <button type="button" class="btn btn-warning" onclick="clicked.cancelBtn()">Cancel</button>
+        </div>
+    </div>
+    <div class="student-list-container col-sm-8">
+        <table class="student-list table">
+            <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Student Course</th>
+                <th>Student Grade</th>
+                <th>Operations</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="displayMsgModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title"></h1>
+                <div class="loader"></div>
+            </div>
+            <div class="modal-body">
+                <h2 id = "message"></h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modalExit btn-lg btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -35,6 +35,14 @@ function clickedConstructor() {
     this.removeBtn = function (element) {
         student.remove(element);
     };
+
+    this.updateBtn = function (element) {
+        update.edit(element);
+    };
+
+    this.submitUpdateBtn = function(element){
+        student.update(element);
+    }
 }
 /**
  * student_array - global array to hold student objects
@@ -78,6 +86,7 @@ function studentConstructor() {
             index++;
         }
         server.createData(this.studentObj);
+        server.createData(this.studentObj);
     };
 
     this.calculateAverage = function () {
@@ -95,6 +104,20 @@ function studentConstructor() {
         student.array.splice(removeIndex,1);
         update.data();
     };
+
+    this.update = function (updateBtnElement) {
+        var updateIndex = parseInt(updateBtnElement.getAttribute('index'));
+        var payload = {
+            student : {
+                id : parseInt(student.array[updateIndex].id),
+                name : $("input[edit=" + this.inputIds[0] + updateIndex + "]").val(),
+                course : $("input[edit=" + this.inputIds[1] + updateIndex + "]").val(),
+                grade : parseInt($("input[edit=" + this.inputIds[2] + updateIndex + "]").val()),
+            }
+        };
+        console.log(payload);
+        server.updateData(payload);
+    }
 }
 
 /**
@@ -118,7 +141,15 @@ function updateConstructor() {
         }
     };
 
-
+    this.edit = function (updateBtnElement) {
+        console.log(updateBtnElement);
+        var index = $(updateBtnElement).attr('index');
+        student.inputIds.map(function (classN) {
+            $('.' + classN + index).replaceWith('<td><input type="text" class="form-control" edit="' + classN + index + '" id="studentName" value="'+ $('.' + classN + index).text() +'"></td>');
+        });
+        $("button[index=" + index + "]").hide();
+        $(updateBtnElement).parent().append("<button index='" +index + "' type ='button' class ='btn btn-warning' onclick ='student.update(this)'>Submit</button>");
+    };
 
 }
 /**
@@ -136,10 +167,10 @@ function updateConstructor() {
 function displayConstructor() {
     this.addStudentToDom = function (passedStudentObj,index) {
         var element = {
-            name : "<td>"+passedStudentObj.name +"</td>",
-            course : "<td>"+passedStudentObj.course+"</td>",
-            grade : "<td>"+passedStudentObj.grade+"</td>",
-            removeButton : "<td><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button></td>"
+            name : "<td class='"+ student.inputIds[0]+ index +"'>"+passedStudentObj.name +"</td>",
+            course : "<td class='"+ student.inputIds[1]+ index +"'>"+passedStudentObj.course +"</td>",
+            grade : "<td class='"+ student.inputIds[2]+ index +"'>"+passedStudentObj.grade +"</td>",
+            removeButton : "<td><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button><button type ='button' class ='btn btn-info' index ='" + index + "' onclick ='clicked.updateBtn(this)'>Update</button></td>"
         };
         $('.student-list tbody').append('<tr>'+ element.name + element.course + element.grade + element.removeButton + '</tr>');
         this.clearAddStudentForm();
@@ -199,7 +230,7 @@ function serverConstructor() {
     this.getData = function () {
         $.ajax({
             'dataType' : 'json',
-            'url' : 'https://ninojoseph.com/sgt/read',
+            'url' : 'https://ninojoseph.com/sgt/api/read',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     student.array = serverObj.students.slice().reverse();
@@ -221,7 +252,7 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            url: 'https://ninojoseph.com/sgt/create',
+            url: 'https://ninojoseph.com/sgt/api/create',
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function(serverObj) {
@@ -241,6 +272,23 @@ function serverConstructor() {
         });
     };
 
+    this.updateData = function (payload) {
+        $.ajax({
+            contentType :'application/json',
+            type: "POST",
+            url: 'https://ninojoseph.com/sgt/api/update',
+            data: JSON.stringify(payload),
+            dataType: "json",
+            "success" : function(serverObj) {
+                $(".student-list > tbody").html("");
+                server.getData();
+            },
+            error: function(serverObj) {
+                display.errorModal("Response failed");
+            }
+        });
+    };
+
     this.deleteData = function (payload) {
         display.modal("Deleting Data From the Friendly Skies!");
         $.ajax({
@@ -248,7 +296,7 @@ function serverConstructor() {
             'dataType' : 'json',
             'method' : 'POST',
             'data' : JSON.stringify(payload),
-            'url' : 'https://ninojoseph.com/sgt/delete',
+            'url' : 'https://ninojoseph.com/sgt/api/delete',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     server.getData();
@@ -266,3 +314,4 @@ function serverConstructor() {
         });
     };
 }
+

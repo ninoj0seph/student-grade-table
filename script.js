@@ -86,7 +86,6 @@ function studentConstructor() {
             index++;
         }
         server.createData(this.studentObj);
-        server.createData(this.studentObj);
     };
 
     this.calculateAverage = function () {
@@ -170,7 +169,7 @@ function displayConstructor() {
             name : "<td class='"+ student.inputIds[0]+ index +"'>"+passedStudentObj.name +"</td>",
             course : "<td class='"+ student.inputIds[1]+ index +"'>"+passedStudentObj.course +"</td>",
             grade : "<td class='"+ student.inputIds[2]+ index +"'>"+passedStudentObj.grade +"</td>",
-            removeButton : "<td><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button><button type ='button' class ='btn btn-info' index ='" + index + "' onclick ='clicked.updateBtn(this)'>Update</button></td>"
+            removeButton : "<td><div class='btn-group-horizontal'><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button><button type ='button' class ='btn btn-info' index ='" + index + "' onclick ='clicked.updateBtn(this)'>Update</button></div></td>"
         };
         $('.student-list tbody').append('<tr>'+ element.name + element.course + element.grade + element.removeButton + '</tr>');
         this.clearAddStudentForm();

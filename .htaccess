@@ -1,2 +1,0 @@
-RewriteEngine on
-RewriteRule ^sgt/api/(.*) request.php?action=$1 [NC]

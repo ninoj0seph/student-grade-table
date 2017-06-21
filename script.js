@@ -242,8 +242,7 @@ function serverConstructor() {
     this.getData = function () {
         $.ajax({
             'dataType' : 'json',
-            // 'url' : 'https://ninojoseph.com/sgt/api/read',
-            'url' : 'http://localhost:8888/request.php?action=Read',
+            'url' : 'https://ninojoseph.com/sgt/api/read',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     student.array = serverObj.students.slice().reverse();
@@ -265,8 +264,7 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            // url: 'https://ninojoseph.com/sgt/api/create',
-            'url' : 'http://localhost:8888/request.php?action=create',
+            url: 'https://ninojoseph.com/sgt/api/create',
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function(serverObj) {
@@ -290,8 +288,7 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            // url: 'https://ninojoseph.com/sgt/api/update',
-            'url' : 'http://localhost:8888/request.php?action=update',
+            url: 'https://ninojoseph.com/sgt/api/update',
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function() {
@@ -311,8 +308,7 @@ function serverConstructor() {
             'dataType' : 'json',
             'method' : 'POST',
             'data' : JSON.stringify(payload),
-            // 'url' : 'https://ninojoseph.com/sgt/api/delete',
-            'url' : 'http://localhost:8888/request.php?action=delete',
+            'url' : 'https://ninojoseph.com/sgt/api/delete',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     setTimeout(function () {

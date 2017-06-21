@@ -77,7 +77,7 @@ function studentConstructor() {
         var index = 0;
         for(var key in this.studentObj.student){
             this.studentObj.student[key] = $('#' + this.inputIds[index]).val();
-            if(this.studentObj.student[key] === ""){
+            if(!/^[a-zA-Z-,0-9]+(\s{0,1}[a-zA-Z-, 0-9])*$/.test(this.studentObj.student[key])){
                 display.alertBoxShow('Invalid input: Student ' + key);
                 return;
             }
@@ -199,7 +199,7 @@ function displayConstructor() {
     };
 
     this.modal = function (messageToShow) {
-        $('.modal-title').text("Please Wait");
+        $('.messageModalTitle').text("Please Wait");
         $("#message").text(messageToShow);
         $("#displayMsgModal").modal('toggle');
         $('.loader').show();
@@ -207,7 +207,7 @@ function displayConstructor() {
     };
 
     this.errorModal = function (message) {
-        $('.modal-title').text("Something went wrong");
+        $('.messageModalTitle').text("Something went wrong");
         $('#message').text(message);
         $('.loader').hide();
         $('.modalExit').show();
@@ -223,14 +223,19 @@ function displayConstructor() {
     };
 
     this.removeModal = function (btnElement) {
-        $('.deleteFooter').html('');
-        $("#deleteConfirm").modal('toggle');
-        const toAppend = $(btnElement).attr({
+        $('.deleteFooter').html('').append(
+            '<button type="button" class="modalCancel btn btn-warning" data-dismiss="modal">Cancel</button>'
+        );
+        $(btnElement).clone().attr({
             onclick :'student.remove(this)',
             'data-dismiss' : 'modal'
         }).appendTo('.deleteFooter');
-        $('.deleteFooter').append(toAppend);
-    }
+        $("#deleteConfirm").modal('toggle');
+    };
+
+    this.rangeNumber = function (currentVal) {
+        if(currentVal > 101) $('.numberInput').val(100);
+    };
 }
 
 function serverConstructor() {

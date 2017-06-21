@@ -52,8 +52,8 @@
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-education"></span>
             </span>
-            <input type="number" max="100" class="form-control" name="studentGrade" id="studentGrade"
-                   placeholder="Student Grade" maxlength="3" onkeypress="return display.disableLetters(event)">
+            <input type="number" max="100" class="form-control numberInput" name="studentGrade" id="studentGrade"
+                   placeholder="Student Grade" onkeypress="return display.disableLetters(event)" onchange="display.rangeNumber(parseInt(this.value))">
         </div>
         <div class="btn-group-horizontal">
             <button type="button" class="btn btn-success" onclick="clicked.addBtn()">Add</button>
@@ -78,7 +78,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title"></h1>
+                <h1 class="messageModalTitle modal-title"></h1>
                 <div class="loader"></div>
             </div>
             <div class="modal-body">
@@ -97,8 +97,6 @@
                 <h2 class="modal-title">Are you sure you want to delete this student?</h2>
             </div>
             <div class="deleteFooter modal-footer">
-                <button type="button" class="modalRemove btn btn-danger" data-dismiss="modal" onclick="">Remove</button>
-
             </div>
         </div>
     </div>

@@ -33,7 +33,7 @@ function clickedConstructor() {
     };
 
     this.removeBtn = function (element) {
-        student.remove(element);
+        display.removeModal(element);
     };
 
     this.updateBtn = function (element) {
@@ -77,7 +77,6 @@ function studentConstructor() {
         var index = 0;
         for(var key in this.studentObj.student){
             this.studentObj.student[key] = $('#' + this.inputIds[index]).val();
-            console.log(this)
             if(this.studentObj.student[key] === ""){
                 display.alertBoxShow('Invalid input: Student ' + key);
                 return;
@@ -97,6 +96,7 @@ function studentConstructor() {
     };
 
     this.remove = function (removeBtnElement) {
+        console.log(removeBtnElement)
         var removeIndex = parseInt(removeBtnElement.getAttribute('index'));
         var payload = {sid : student.array[removeIndex].id};
         server.deleteData(payload);
@@ -114,7 +114,6 @@ function studentConstructor() {
                 grade : parseInt($("input[edit=" + this.inputIds[2] + updateIndex + "]").val()),
             }
         };
-        console.log(payload);
         server.updateData(payload);
     }
 }
@@ -141,13 +140,12 @@ function updateConstructor() {
     };
 
     this.edit = function (updateBtnElement) {
-        console.log(updateBtnElement);
         var index = $(updateBtnElement).attr('index');
         student.inputIds.map(function (classN) {
             $('.' + classN + index).replaceWith('<td><input type="text" class="form-control" edit="' + classN + index + '" id="studentName" value="'+ $('.' + classN + index).text() +'"></td>');
         });
         $("button[index=" + index + "]").hide();
-        $(updateBtnElement).parent().append("<button index='" +index + "' type ='button' class ='btn btn-warning' onclick ='student.update(this)'>Submit</button>");
+        $(updateBtnElement).parent().append("<button index='" + index + "' type ='button' class ='btn btn-warning' onclick ='student.update(this)'>Submit</button>");
     };
 
 }
@@ -223,13 +221,24 @@ function displayConstructor() {
         $('.alert span').html('<strong>Error! </strong>' + outputText);
         $('.alert').show();
     };
+
+    this.removeModal = function (btnElement) {
+        $('.deleteFooter').html('');
+        $("#deleteConfirm").modal('toggle');
+        const toAppend = $(btnElement).attr({
+            onclick :'student.remove(this)',
+            'data-dismiss' : 'modal'
+        }).appendTo('.deleteFooter');
+        $('.deleteFooter').append(toAppend);
+    }
 }
 
 function serverConstructor() {
     this.getData = function () {
         $.ajax({
             'dataType' : 'json',
-            'url' : 'https://ninojoseph.com/sgt/api/read',
+            // 'url' : 'https://ninojoseph.com/sgt/api/read',
+            'url' : 'http://localhost:8888/request.php?action=Read',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     student.array = serverObj.students.slice().reverse();
@@ -251,7 +260,8 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            url: 'https://ninojoseph.com/sgt/api/create',
+            // url: 'https://ninojoseph.com/sgt/api/create',
+            'url' : 'http://localhost:8888/request.php?action=create',
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function(serverObj) {
@@ -265,7 +275,7 @@ function serverConstructor() {
                     display.errorModal(serverObj.status);
                 }
             },
-            error: function(serverObj) {
+            error: function() {
                 display.errorModal("Response failed");
             }
         });
@@ -275,14 +285,15 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            url: 'https://ninojoseph.com/sgt/api/update',
+            // url: 'https://ninojoseph.com/sgt/api/update',
+            'url' : 'http://localhost:8888/request.php?action=update',
             data: JSON.stringify(payload),
             dataType: "json",
-            "success" : function(serverObj) {
+            "success" : function() {
                 $(".student-list > tbody").html("");
                 server.getData();
             },
-            error: function(serverObj) {
+            error: function() {
                 display.errorModal("Response failed");
             }
         });
@@ -295,14 +306,14 @@ function serverConstructor() {
             'dataType' : 'json',
             'method' : 'POST',
             'data' : JSON.stringify(payload),
-            'url' : 'https://ninojoseph.com/sgt/api/delete',
+            // 'url' : 'https://ninojoseph.com/sgt/api/delete',
+            'url' : 'http://localhost:8888/request.php?action=delete',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
-                    server.getData();
                     setTimeout(function () {
                         display.modal();
                     },1000);
-
+                    server.getData();
                 } else {
                     display.errorModal(serverObj.status);
                 }

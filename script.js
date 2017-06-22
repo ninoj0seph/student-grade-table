@@ -234,7 +234,7 @@ function displayConstructor() {
     };
 
     this.rangeNumber = function (currentVal) {
-        if(currentVal > 101) $('.numberInput').val(100);
+        if(currentVal > 100) $('.numberInput').val(100);
     };
 }
 

@@ -96,7 +96,6 @@ function studentConstructor() {
     };
 
     this.remove = function (removeBtnElement) {
-        console.log(removeBtnElement)
         var removeIndex = parseInt(removeBtnElement.getAttribute('index'));
         var payload = {sid : student.array[removeIndex].id};
         server.deleteData(payload);

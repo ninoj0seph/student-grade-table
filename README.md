@@ -3,7 +3,7 @@
 A Content Management System (CMS) application created for instructors / teachers / professors to manage student's grades from various different courses.
 
 ## Features
-- **CREATE | READ | UPDATE | DELETE** - CRUD
+- Created a custom API complete with **CREATE | READ | UPDATE | DELETE**
     - Input form boxes to **Add** or **Create** a student from the client to the server.
         - **Form Validation** that constantly checks for incorrect or invalid input.
     - Automatically **Reads** the data from the server to the client upon load.
@@ -29,4 +29,3 @@ A Content Management System (CMS) application created for instructors / teachers
 -   CSS
 -   Bootstrap
 -   Apache
--   RESTful

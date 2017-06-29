@@ -1,28 +1,14 @@
-/**
- * Define all global variables here
- */
 var clicked = new clickedConstructor();
 var student = new studentConstructor();
 var update = new updateConstructor();
 var display = new displayConstructor();
 var server = new serverConstructor();
 
-/**
- * Listen for the document to load and reset the data to the initial state
- *
- */
 $(document).ready(function () {
     display.reset();
     server.getData();
 });
 
-/**
- * addClicked - Event Handler when user clicks the add button
- */
-/**
- * cancelClicked - Event Handler when user clicks the cancel button, should clear out student form
- *
- */
 function clickedConstructor() {
     this.addBtn = function () {
       student.addStudent();
@@ -44,86 +30,65 @@ function clickedConstructor() {
         student.update(element);
     }
 }
-/**
- * student_array - global array to hold student objects
- * @type {Array}
- */
-
-/**
- * inputIds - id's of the elements that are used to add students
- * @type {string[]}
- */
-/**
- * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
- *
- * @return undefined
- */
-/**
- * calculateAverage - loop through the global student array and calculate average grade and return that value
- * @returns {number}
- */
 
 function studentConstructor() {
     this.array = [];
     this.inputIds = ['studentName', 'course', 'studentGrade'];
     this.addStudent = function () {
-        this.studentObj = {
-            student : {
-                name : null,
-                course : null,
-                grade : null
-            }
-        };
-        var index = 0;
-        for(var key in this.studentObj.student){
-            this.studentObj.student[key] = $('#' + this.inputIds[index]).val();
-            if(!/^[a-zA-Z-,0-9]+(\s{0,1}[a-zA-Z-, 0-9])*$/.test(this.studentObj.student[key])){
-                display.alertBoxShow('Invalid input: Student ' + key);
-                return;
-            }
+        let addStudentPayload = {student : {name : null, course : null, grade : null}}, inputBoxIndex = 0;
+        for(let key in addStudentPayload.student){
             display.alertBoxHide();
-            index++;
+            let inputValue = $('#' + this.inputIds[inputBoxIndex++]).val();
+            if(this.validateInput(inputValue)){
+                addStudentPayload.student[key] = inputValue;
+            } else {
+                display.alertBoxShow('Invalid input: Student ' + key);
+                return
+            }
         }
-        server.createData(this.studentObj);
+        server.createData(addStudentPayload);
     };
 
-    this.calculateAverage = function () {
-        var total = 0;
-        for(var i = 0; i  < this.array.length; i++){
-            total += parseInt(this.array[i].grade);
+    this.update = function (updateBtnElement) {
+        let updateIndex = parseInt(updateBtnElement.getAttribute('index')),
+            updateStudentPayload = {student : {name : null, course : null, grade : null}},
+            inputBoxIndex = 0;
+
+        for(let key in updateStudentPayload.student){
+            display.alertBoxHide();
+            let inputValue = $("input[edit=" + this.inputIds[inputBoxIndex++] + updateIndex + "]").val();
+            if(this.validateInput(inputValue)){
+                updateStudentPayload.student[key] = inputValue;
+            } else {
+                display.alertBoxShow('Invalid edit input: Student ' + key);
+                return
+            }
         }
-        return ~~(total / this.array.length);
+        updateStudentPayload.student.id = parseInt(student.array[updateIndex].id);
+        server.createData(updateStudentPayload);
     };
 
     this.remove = function (removeBtnElement) {
-        var removeIndex = parseInt(removeBtnElement.getAttribute('index'));
-        var payload = {sid : student.array[removeIndex].id};
+        let removeIndex = parseInt(removeBtnElement.getAttribute('index'));
+        let payload = {sid : student.array[removeIndex].id};
         server.deleteData(payload);
         student.array.splice(removeIndex,1);
         update.data();
     };
 
-    this.update = function (updateBtnElement) {
-        var updateIndex = parseInt(updateBtnElement.getAttribute('index'));
-        var payload = {
-            student : {
-                id : parseInt(student.array[updateIndex].id),
-                name : $("input[edit=" + this.inputIds[0] + updateIndex + "]").val(),
-                course : $("input[edit=" + this.inputIds[1] + updateIndex + "]").val(),
-                grade : parseInt($("input[edit=" + this.inputIds[2] + updateIndex + "]").val()),
-            }
-        };
-        server.updateData(payload);
-    }
+    this.validateInput = function (elementValue) {
+        return /^[a-zA-Z-,0-9]+(\s{0,1}[a-zA-Z-, 0-9])*$/.test(elementValue) ? true : false;
+    };
+
+    this.calculateAverage = function () {
+        let total = 0;
+        for(let i = 0; i  < this.array.length; i++){
+            total += parseInt(this.array[i].grade);
+        }
+        return ~~(total / this.array.length);
+    };
+
 }
-
-/**
- * updateData - centralized function to update the average and call student list update
- */
-
-/**
- * updateStudentList - loops through global student array and appends each objects data into the student-list-container > list-body
- */
 
 function updateConstructor() {
     this.data = function () {
@@ -141,24 +106,21 @@ function updateConstructor() {
     this.edit = function (updateBtnElement) {
         var index = $(updateBtnElement).attr('index');
         student.inputIds.map(function (classN) {
-            $('.' + classN + index).replaceWith('<td><input type="text" class="form-control" edit="' + classN + index + '" id="studentName" value="'+ $('.' + classN + index).text() +'"></td>');
+            $('.' + classN + index).replaceWith(
+                '<td>' +
+                    '<input type="text" class="form-control" edit="' + classN + index + '" id="studentName" value="'+ $('.' + classN + index).text() +'">' +
+                '</td>'
+            );
         });
         $("button[index=" + index + "]").hide();
+        $("input[edit=" + student.inputIds[2] + index + "]").change(function () {
+            display.rangeNumber(this);
+        }).keypress(function () {
+            return display.disableLetters(event);
+        }).attr({type : 'number', max : 100, min : 1});
         $(updateBtnElement).parent().append("<button index='" + index + "' type ='button' class ='btn btn-warning' onclick ='student.update(this)'>Submit</button>");
     };
-
 }
-/**
- * addStudentToDom - take in a student object, create html elements from the values and then append the elements
- * into the .student_list tbody
- * @param studentObj
- */
-/**
- * reset - resets the application to initial state. Global variables reset, DOM get reset to initial load state
- */
-/**
- * clearAddStudentForm - clears out the form values based on inputIds variable
- */
 
 function displayConstructor() {
     this.addStudentToDom = function (passedStudentObj,index) {
@@ -166,7 +128,13 @@ function displayConstructor() {
             name : "<td class='"+ student.inputIds[0]+ index +"'>"+passedStudentObj.name +"</td>",
             course : "<td class='"+ student.inputIds[1]+ index +"'>"+passedStudentObj.course +"</td>",
             grade : "<td class='"+ student.inputIds[2]+ index +"'>"+passedStudentObj.grade +"</td>",
-            removeButton : "<td><div class='btn-group-horizontal'><button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button><button type ='button' class ='btn btn-info' index ='" + index + "' onclick ='clicked.updateBtn(this)'>Update</button></div></td>"
+            removeButton :
+            "<td>" +
+            "   <div class='btn-group-horizontal'>" +
+            "       <button type ='button' class ='btn btn-danger' index ='" + index + "' onclick ='clicked.removeBtn(this)'>Remove</button>" +
+            "       <button type ='button' class ='btn btn-info' index ='" + index + "' onclick ='clicked.updateBtn(this)'>Update</button>" +
+            "   </div>" +
+            "</td>"
         };
         $('.student-list tbody').append('<tr>'+ element.name + element.course + element.grade + element.removeButton + '</tr>');
         this.clearAddStudentForm();
@@ -185,7 +153,8 @@ function displayConstructor() {
     };
 
     this.gradeAverage = function (value) {
-        $('.avgGrade').removeClass('label-success label-warning label-danger label-default').addClass(value >= 80 ? 'label-success' : value >= 70 ? 'label-warning' : 'label-danger').text(value);
+        $('.avgGrade').removeClass('label-success label-warning label-danger label-default').addClass(value >= 80 ? 'label-success' : value >= 70 ?
+            'label-warning' : 'label-danger').text(value);
     };
 
     this.disableLetters = function (evt) {
@@ -232,8 +201,8 @@ function displayConstructor() {
         $("#deleteConfirm").modal('toggle');
     };
 
-    this.rangeNumber = function (currentVal) {
-        if(currentVal > 100) $('.numberInput').val(100);
+    this.rangeNumber = function (element) {
+        if(parseInt(element.value) > 100) element.value = 100;
     };
 }
 
@@ -241,7 +210,8 @@ function serverConstructor() {
     this.getData = function () {
         $.ajax({
             'dataType' : 'json',
-            'url' : 'https://ninojoseph.com/sgt/api/read',
+            // 'url' : 'https://ninojoseph.com/sgt/api/read',
+            url : 'http://localhost:8888/request.php?action=read',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     student.array = serverObj.students.slice().reverse();
@@ -263,7 +233,8 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            url: 'https://ninojoseph.com/sgt/api/create',
+            // url: 'https://ninojoseph.com/sgt/api/create',
+            url : 'http://localhost:8888/request.php?action=create',
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function(serverObj) {
@@ -287,7 +258,8 @@ function serverConstructor() {
         $.ajax({
             contentType :'application/json',
             type: "POST",
-            url: 'https://ninojoseph.com/sgt/api/update',
+            // url: 'https://ninojoseph.com/sgt/api/update',
+            url : 'http://localhost:8888/request.php?action=update',
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function() {
@@ -307,7 +279,8 @@ function serverConstructor() {
             'dataType' : 'json',
             'method' : 'POST',
             'data' : JSON.stringify(payload),
-            'url' : 'https://ninojoseph.com/sgt/api/delete',
+            // 'url' : 'https://ninojoseph.com/sgt/api/delete',
+            url : 'http://localhost:8888/request.php?action=delete',
             "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     setTimeout(function () {

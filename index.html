@@ -52,8 +52,8 @@
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-education"></span>
             </span>
-            <input type="number" max="100" class="form-control numberInput" name="studentGrade" id="studentGrade"
-                   placeholder="Student Grade" onkeypress="return display.disableLetters(event)" onchange="display.rangeNumber(parseInt(this.value))">
+            <input type="number" min="1" max="100" class="form-control numberInput" name="studentGrade" id="studentGrade"
+                   placeholder="Student Grade" onkeypress="return display.disableLetters(event)" onchange="display.rangeNumber(this)">
         </div>
         <div class="btn-group-horizontal">
             <button type="button" class="btn btn-success" onclick="clicked.addBtn()">Add</button>

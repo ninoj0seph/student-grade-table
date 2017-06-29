@@ -261,7 +261,7 @@ function serverConstructor() {
             url: 'https://ninojoseph.com/sgt/api/update',
             data: JSON.stringify(payload),
             dataType: "json",
-            "success" : function() {
+            "success" : function(serverObj) {
                 if(serverObj.status === 200){
                     setTimeout(function () {
                         $(".student-list > tbody").html("");

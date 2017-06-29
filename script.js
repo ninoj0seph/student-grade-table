@@ -124,10 +124,11 @@ function updateConstructor() {
 
 function displayConstructor() {
     this.addStudentToDom = function (passedStudentObj,index) {
+        var tdClassName = passedStudentObj.grade >= 80 ? 'active success' : passedStudentObj.grade >= 70 ? 'active warning' : 'active danger';
         var element = {
             name : "<td class='"+ student.inputIds[0]+ index +"'>"+passedStudentObj.name +"</td>",
             course : "<td class='"+ student.inputIds[1]+ index +"'>"+passedStudentObj.course +"</td>",
-            grade : "<td class='"+ student.inputIds[2]+ index +"'>"+passedStudentObj.grade +"</td>",
+            grade : "<td class='"+ student.inputIds[2]+ index + ' ' + tdClassName + "'>"+passedStudentObj.grade +"</td>",
             removeButton :
             "<td>" +
             "   <div class='btn-group-horizontal'>" +

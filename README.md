@@ -10,7 +10,7 @@ A Content Management System application created for instructor to manage student
     - Ability to **Delete** a student from the
         - Added a **Delete Confirmation** to avoid accidental deletes.
     - **Syncs** the data at the client from the server and vice versa.
-- **Grade Point Average Inidicator** where it calculates all the students average grades, matched with color coding
+- **Grade Point Average Indicator** that calculates all the students average grades, matched with color coding.
     - **RED** for GPA's under **70**.
     - **YELLOW** for GPA's between **70** and **80**.
     - **GREEN** for GPA's over **80**. 

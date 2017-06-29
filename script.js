@@ -262,7 +262,7 @@ function serverConstructor() {
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function(serverObj) {
-                if(serverObj.status === 200){
+                if(serverObj.status == 200){
                     setTimeout(function () {
                         $(".student-list > tbody").html("");
                         server.getData();

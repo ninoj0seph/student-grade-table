@@ -65,7 +65,7 @@ function studentConstructor() {
             }
         }
         updateStudentPayload.student.id = parseInt(student.array[updateIndex].id);
-        server.createData(updateStudentPayload);
+        server.updateData(updateStudentPayload);
     };
 
     this.remove = function (removeBtnElement) {

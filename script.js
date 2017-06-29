@@ -262,9 +262,15 @@ function serverConstructor() {
             data: JSON.stringify(payload),
             dataType: "json",
             "success" : function() {
-                $(".student-list > tbody").html("");
-                server.getData();
-                display.modal();
+                if(serverObj.status === 200){
+                    setTimeout(function () {
+                        $(".student-list > tbody").html("");
+                        server.getData();
+                        display.modal();
+                    },1000)
+                } else {
+                    display.errorModal(serverObj.status);
+                }
             },
             error: function() {
                 display.errorModal("Response failed");

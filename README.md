@@ -1,6 +1,5 @@
 # Student Grade Table
-
-A Content Management System (CMS) application created for instructors / teachers / professors to manage student's grades from various different courses. An Application Developed to demonstrate the concepts of Create, Read, Update and Delete.
+A Content Management System application created for instructor to manage student's grades from different courses.  Developed the application to prove the concepts of Create, Read, Update and Delete.
 
 ## Features
 - Created a custom API complete with **CREATE | READ | UPDATE | DELETE**

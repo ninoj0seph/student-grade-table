@@ -254,6 +254,7 @@ function serverConstructor() {
     };
 
     this.updateData = function (payload) {
+        display.modal("Updating Data to the Friendly Skies!");
         $.ajax({
             contentType :'application/json',
             type: "POST",
@@ -263,6 +264,7 @@ function serverConstructor() {
             "success" : function() {
                 $(".student-list > tbody").html("");
                 server.getData();
+                display.modal();
             },
             error: function() {
                 display.errorModal("Response failed");
